@@ -66,6 +66,11 @@ namespace FanoutSearch
             return ret;
         }
 
+        public static void RegisterQueryWhilelistType(Type t)
+        {
+            TraverseActionSecurityChecker.RegisterQueryWhitelistType(t);
+        }
+
         protected override void RegisterMessageHandler()
         {
             base.RegisterMessageHandler();
