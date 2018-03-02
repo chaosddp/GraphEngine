@@ -325,6 +325,8 @@ public static class FanoutSearchDescriptorEvaluator
 
                 scriptOptions = scriptOptions.AddReferences(mscorlib, systemCore, expression, fanout, trinity);
 
+                scriptOptions = scriptOptions.AddReferences(queryAssemblySet.ToArray());
+
                 scriptOptions = scriptOptions.AddImports(
                     "System",
                     "System.Linq",
@@ -334,6 +336,8 @@ public static class FanoutSearchDescriptorEvaluator
                     "FanoutSearch.LIKQ",
                     "Trinity",
                     "Trinity.Storage");
+
+                var msg = string.Empty;
 
                 try
                 {
@@ -353,9 +357,9 @@ public static class FanoutSearchDescriptorEvaluator
                     ret = eval_task.Result;
                 }
                 catch (ArithmeticException) { /* that's a fault not an error */ throw; }
-                catch { /*swallow roslyn scripting engine exceptions.*/ }
+                catch (Exception ex){ /*swallow roslyn scripting engine exceptions.*/ msg = ex.Message; }
 
-                ThrowIf(null == ret, "Invalid lambda expression.", traverseAction);
+                ThrowIf(null == ret, "Invalid lambda expression, " + "msg:" + msg, traverseAction);
                 return ret;
             }
 
@@ -485,5 +489,14 @@ public static class FanoutSearchDescriptorEvaluator
             s_LIKQ_FollowEdge = followEdge;
             s_LIKQ_Action     = action;
         }
+
+        public static void AddQueryAssembly(Assembly assembly)
+        {
+            // in case we want to use lambda query to support customize query
+
+            if(assembly!=null) queryAssemblySet.Add(assembly);
+        }
+
+        internal static HashSet<Assembly> queryAssemblySet = new HashSet<Assembly>();
     }
 }
